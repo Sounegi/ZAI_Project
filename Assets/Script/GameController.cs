@@ -2,34 +2,71 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 public class GameController : MonoBehaviour
 {
     [SerializeField] bool multiplay = false;
-    [SerializeField] bool auntTurn;
+    [SerializeField] public bool auntTurn;
 
-    [SerializeField] float auntMaxHp;
-    [SerializeField] float auntCurHp;
-    [SerializeField] Slider auntHpBar;
+    [SerializeField] Player aunt;
+    //[SerializeField] float auntMaxHp;
+    //[SerializeField] float auntCurHp;
+    [SerializeField] GameObject auntHpBar;
     [SerializeField] GameObject auntHitbox;
     [SerializeField] GameObject auntShootButton;
 
-    [SerializeField] float pigMaxHp;
-    [SerializeField] float pigCurHp;
-    [SerializeField] Slider pigHpBar;
+    [SerializeField] Player pig;
+    //[SerializeField] float pigMaxHp;
+    //[SerializeField] float pigCurHp;
+    [SerializeField] GameObject pigHpBar;
     [SerializeField] GameObject pigHitbox;
     [SerializeField] GameObject pigShootButton;
 
     float thinkTime = 30.0f;
     float warnTime = 10.0f;
 
+    
+    [SerializeField] GameObject startPanel;
+    [SerializeField] GameObject h2pPanel;
+    [SerializeField] GameObject modePanel;
+    [SerializeField] GameObject gameEndPanel;
+    [SerializeField] Text winText;
+
+    [SerializeField] WindField wf;
+
     private void Start()
     {
-        SetUp(multiplay);
+        startPanel.SetActive(true);
+        h2pPanel.SetActive(false);
+        modePanel.SetActive(false);
+        gameEndPanel.SetActive(false);
+        auntHpBar.SetActive(false);
+        auntShootButton.SetActive(false);
+        pigHpBar.SetActive(false);
+        pigShootButton.SetActive(false);
+
+        //SetUp(multiplay);
     }
 
-    private void SetUp(bool multi)
+    public void StartPlay()
     {
+        modePanel.SetActive(true);
+        startPanel.SetActive(false);
+        h2pPanel.SetActive(false);
+    }
+
+    public void How2Play()
+    {
+        h2pPanel.SetActive(true);
+        startPanel.SetActive(false);
+    }
+
+    public void SetUp(bool multi)
+    {
+        modePanel.SetActive(false);
+        auntHpBar.SetActive(true);
+        pigHpBar.SetActive(true);
         if (multi)
         {
 
@@ -45,13 +82,14 @@ public class GameController : MonoBehaviour
             auntTurn = false;
             StartCoroutine(TurnCountDown());
         }
+        wf.GenerateWind();
     }
 
-    private void ChangeTurn(bool turn)
+    private void ChangeTurn()
     {
         //Stop if already change turn
         StopCoroutine(TurnCountDown());
-        if (turn)
+        if (auntTurn)
         {
             auntHitbox.SetActive(false);
             auntShootButton.SetActive(true);
@@ -73,10 +111,36 @@ public class GameController : MonoBehaviour
             auntTurn = true;
             StartCoroutine(TurnCountDown());
         }
+        wf.GenerateWind();
     }
 
-    public void CalculateDamage(bool hitAunt, float damage)
+    public void WaitResult()
     {
+        auntShootButton.SetActive(false);
+        pigShootButton.SetActive(false);
+        StopAllCoroutines();
+        StartCoroutine(ShootWait());
+    }
+
+    IEnumerator ShootWait()
+    {
+        yield return new WaitForSecondsRealtime(3.0f);
+        ChangeTurn();
+    }
+
+    public void CheckHp()
+    {
+        if (aunt.curHp <= 0.0f)
+        {
+            GameEnd(false);
+            return;
+        }
+        else if(pig.curHp <= 0.0f)
+        {
+            GameEnd(true);
+            return;
+        }
+        /*
         if (hitAunt)
         {
             auntCurHp -= damage;
@@ -97,12 +161,36 @@ public class GameController : MonoBehaviour
                 return;
             }
         }
-        ChangeTurn(auntTurn);
+        */
+        Debug.Log("Hit!");
     }
+
 
     private void GameEnd(bool auntWin)
     {
+        auntShootButton.SetActive(false);
+        pigShootButton.SetActive(false);
+        if (multiplay)
+        {
 
+        }
+        else
+        {
+            if (auntWin)
+            {
+                winText.text = "Aunt Win!";
+            }
+            else
+            {
+                winText.text = "RichPig Win!";
+            }
+        }
+        gameEndPanel.SetActive(true);
+    }
+
+    public void Replay()
+    {
+        Start();
     }
 
     IEnumerator TurnCountDown()
@@ -112,7 +200,7 @@ public class GameController : MonoBehaviour
         Debug.Log("Warning 10s left!");
         yield return new WaitForSecondsRealtime(warnTime);
 
-        ChangeTurn(auntTurn);
+        ChangeTurn();
     }
 
     

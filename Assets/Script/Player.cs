@@ -5,10 +5,13 @@ using UnityEngine.UI;
 using UnityEngine.Networking;
 using SimpleJSON;
 using System.Globalization;
+using UnityEngine.Events;
 
-public class ShootObject : MonoBehaviour
+public class Player : MonoBehaviour
 {
-    [SerializeField] GameController Game;
+    public float maxHp;
+    public float curHp;
+    [SerializeField] Slider hpBar;
 
     [SerializeField] GameObject bulletPF;
     [SerializeField] Transform shootingPoint;
@@ -17,6 +20,10 @@ public class ShootObject : MonoBehaviour
     public static float chargeSpeed = 0.02f;
     private float maxSpeedX;
     private float maxSpeedY;
+    
+    [SerializeField] UnityEvent getHit;
+    [SerializeField] UnityEvent shoot;
+
 
     private void Awake()
     {
@@ -36,7 +43,14 @@ public class ShootObject : MonoBehaviour
         GameObject bullet = Instantiate(bulletPF, shootingPoint);
         bullet.GetComponent<Rigidbody2D>().velocity = new Vector2((dir? 1: -1)*maxSpeedX*power, maxSpeedY*power);
         powerGauge.SetActive(false);
-        Game.CalculateDamage(true, 10.0f);
+        shoot?.Invoke();
+    }
+
+    public void TakeDamage(float damage)
+    {
+        curHp -= damage;
+        hpBar.value = curHp / maxHp;
+        getHit?.Invoke();
     }
 
     IEnumerator ObtainSheetData()
@@ -91,20 +105,4 @@ public class ShootObject : MonoBehaviour
 
     
 }
-[System.Serializable]
-public class Setting
-{
-    public string Id;
-    public float Value;
-    public Setting(string _Id, float _Value)
-    {
-        Id = _Id;
-        Value = _Value;
-    }
-}
 
-[System.Serializable]
-public class ShootSetting
-{
-    public List<Setting> setts;
-}

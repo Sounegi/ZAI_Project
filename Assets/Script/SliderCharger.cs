@@ -29,7 +29,7 @@ public class SliderCharger : MonoBehaviour
             if (powerGauge.value >= powerGauge.maxValue) dir = true;
             else if (powerGauge.value <= powerGauge.minValue) dir = false;
 
-            powerGauge.value += dir ? -ShootObject.chargeSpeed : ShootObject.chargeSpeed;
+            powerGauge.value += dir ? -Player.chargeSpeed : Player.chargeSpeed;
 
         }
     }
