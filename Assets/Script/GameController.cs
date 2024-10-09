@@ -429,7 +429,7 @@ public class GameController : MonoBehaviour
 
     public void BackToMenu()
     {
-        SceneManager.LoadScene("LoadingScene");
+        SceneManager.LoadScene("LoginScene");
     }
 
 }
