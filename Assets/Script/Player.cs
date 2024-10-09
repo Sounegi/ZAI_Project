@@ -13,22 +13,37 @@ public class Player : MonoBehaviour
     public float curHp;
     [SerializeField] Slider hpBar;
 
+    public int shootAmount;
+    public float bulletDamageData;
+    //public float critDamageData;
     [SerializeField] GameObject bulletPF;
     [SerializeField] Transform shootingPoint;
     [SerializeField] GameObject powerGauge;
 
-    public static float chargeSpeed = 0.02f;
+    /*
+    public float chargeSpeed;
     private float maxSpeedX;
     private float maxSpeedY;
+    */
     
     [SerializeField] UnityEvent getHit;
     [SerializeField] UnityEvent shoot;
 
 
-    private void Awake()
+    private void Start()
     {
-        StartCoroutine(ObtainSheetData());
+        //StartCoroutine(ObtainSheetData());
+        //maxHp = GameData.playerHP;
+        ResetHealth();
     }
+
+    public void ResetHealth()
+    {
+        
+        curHp = maxHp;
+        hpBar.value = curHp / maxHp;
+    }
+
     public void Charge()
     {
         powerGauge.SetActive(true);
@@ -39,11 +54,43 @@ public class Player : MonoBehaviour
     {
         powerGauge.GetComponent<SliderCharger>().charge = false;
         float power = powerGauge.GetComponent<Slider>().value;
-        Debug.Log("Shoot with " +  power +" force");
-        GameObject bullet = Instantiate(bulletPF, shootingPoint);
-        bullet.GetComponent<Rigidbody2D>().velocity = new Vector2((dir? 1: -1)*maxSpeedX*power, maxSpeedY*power);
+        /*
+        for(int i = 0; i < shootAmount; i++)
+        {
+            Debug.Log("Shoot bullet" +i+ "with " +  power +" force");
+            GameObject bullet = Instantiate(bulletPF, shootingPoint);
+            bullet.GetComponent<Bullet>().bulletDamage = bulletDamageData;
+            bullet.GetComponent<Bullet>().critMultiplier = critDamageData;
+            bullet.GetComponent<Rigidbody2D>().velocity = new Vector2((dir? 1: -1)*maxSpeedX*power, maxSpeedY*power);
+        }
+        */
+        StartCoroutine(ShootBullet(dir));
+        //powerGauge.SetActive(false);
+       // shoot?.Invoke();
+    }
+
+    IEnumerator ShootBullet(bool dir)
+    {
+        float power = powerGauge.GetComponent<Slider>().value;
+        for (int i = 0; i < shootAmount; i++)
+        {
+            Debug.Log("Shoot bullet" + i + "with " + power + " force");
+            GameObject bullet = Instantiate(bulletPF, shootingPoint);
+            bullet.GetComponent<Bullet>().bulletDamage = bulletDamageData;
+            //bullet.GetComponent<Bullet>().critMultiplier = GameData.critDamageData;
+            bullet.GetComponent<Rigidbody2D>().velocity = new Vector2((dir ? 1 : -1) * GameData.maxSpeedX * power, GameData.maxSpeedY * power);
+            yield return new WaitForSeconds(1.5f);
+        }
         powerGauge.SetActive(false);
         shoot?.Invoke();
+    }
+
+    public void SetBullet(BulletSetting bulletData)
+    {
+        if (bulletData.prefabs != null) 
+            bulletPF = bulletData.prefabs;
+        bulletDamageData = bulletData.bulletDamage;
+        shootAmount = bulletData.shootAmount;
     }
 
     public void TakeDamage(float damage)
@@ -53,6 +100,7 @@ public class Player : MonoBehaviour
         getHit?.Invoke();
     }
 
+    /*
     IEnumerator ObtainSheetData()
     {
         UnityWebRequest www = UnityWebRequest.Get("https://sheets.googleapis.com/v4/spreadsheets/1EvtYh1pdawobEI3_VKR6tfr970uYd9OimzjuUvMzQR8/values/ShootSetting?key=AIzaSyCZaMfQf-868AAqeQkpTT1DR1sWb3StsE4");
@@ -93,15 +141,10 @@ public class Player : MonoBehaviour
             {
                 Debug.Log("maxSpeedY Set failed");
             }
-            //chargeSpeed = float.Parse(o["values"][1][1]);
-            /*
-            foreach (var item in o["values"])
-            {
-                Debug.Log(item.GetType());
-            }
-            */
+
         }
     }
+    */
 
     
 }

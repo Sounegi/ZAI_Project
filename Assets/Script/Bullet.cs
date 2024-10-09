@@ -5,9 +5,7 @@ using UnityEngine.Events;
 
 public class Bullet : MonoBehaviour
 {
-    [SerializeField] GameController Game;
-    [SerializeField] float bulletDamage;
-    [SerializeField] float critMultiplier;
+    public float bulletDamage;
     private bool firstHit;
     private void Start()
     {
@@ -37,7 +35,7 @@ public class Bullet : MonoBehaviour
                 StartCoroutine(HitPlayer());
                 firstHit = false;
             }
-            collision.collider.GetComponentInParent<Player>().TakeDamage(bulletDamage*critMultiplier);
+            collision.collider.GetComponentInParent<Player>().TakeDamage(bulletDamage*GameData.critDamageMultiplier);
         }
         else
         {

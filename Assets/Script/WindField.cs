@@ -1,17 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class WindField : MonoBehaviour
 {
     private Rigidbody2D affectBullet;
     private bool windapply = false;
     public Vector2 windSpeed;
-    private float maxWinSpeed = 5.0f;
-
+    [SerializeField] Scrollbar bar;
+    //private float maxWinSpeed = 3.5f;
     public void GenerateWind()
     {
-        windSpeed = new Vector2(Random.Range(-maxWinSpeed, maxWinSpeed), 0.0f);
+        float wind = (float)(int) Random.Range(-GameData.maxWindSpeed, GameData.maxWindSpeed);
+        windSpeed = new Vector2(wind, 0.0f);
+        bar.value = (GameData.maxWindSpeed + wind -0.5f)/(2* (GameData.maxWindSpeed- 0.5f));
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -27,7 +30,8 @@ public class WindField : MonoBehaviour
     {
         if (windapply)
         {
-            affectBullet.AddForce(windSpeed,ForceMode2D.Force);
+            if(affectBullet!=null)
+                affectBullet.AddForce(windSpeed,ForceMode2D.Force);
         }
         
     }
