@@ -10,4 +10,11 @@ public class Menu : MonoBehaviour
         Debug.Log("EnterGame");
         SceneManager.LoadScene("MainGame");
     }
+
+    public void GoogleLogin()
+    {
+        //Implement Google Sign-in and show profilepic&name
+
+        StartGame();
+    }
 }

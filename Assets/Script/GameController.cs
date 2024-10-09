@@ -152,20 +152,6 @@ public class GameController : MonoBehaviour
             aunt.maxHp = GameData.playerHP;
             difficultyPanel.SetActive(true);
             multiplay = false;
-            /*
-            auntTurn = true;
-            ChangeBullet(0);
-            auntHitbox.SetActive(false);
-            auntShootButton.SetActive(true);
-            auntPowerUp.SetActive(true);
-
-            pigHitbox.SetActive(true);
-            pigShootButton.SetActive(false);
-            pigPowerUp.SetActive(false);
-
-            StartCoroutine(TurnCountDown());
-            
-            */
         }
         wf.GenerateWind();
     }
